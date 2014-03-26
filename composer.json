@@ -1,0 +1,16 @@
+{
+    "name": "zookal/harris-street-impex",
+    "type": "magento-module",
+    "description": "Composer's and n98-magerun plugin handler to install or update Magento after a 'composer install/update'",
+    "license": "OSL-3",
+    "authors": [
+        {
+            "name": "Cyrill Schumacher",
+            "email": "cyrill@zookal.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "magento-hackathon/magento-composer-installer": "*"
+    }
+}

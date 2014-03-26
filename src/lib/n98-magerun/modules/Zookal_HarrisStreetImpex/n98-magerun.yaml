@@ -1,0 +1,7 @@
+autoloaders:
+  HarrisStreet\CoreConfigData: %module%/src
+
+commands:
+  customCommands:
+    - HarrisStreet\CoreConfigData\Import
+    - HarrisStreet\CoreConfigData\Export
