@@ -1,8 +1,8 @@
 {
     "name": "zookal/harris-street-impex",
     "type": "magento-module",
-    "description": "Composer's and n98-magerun plugin handler to install or update Magento after a 'composer install/update'",
-    "license": "OSL-3",
+    "description": "Magento n98-magerun module for importing and exporting configuration data. Import supports hierarchical folder structure and of course different environments.",
+    "license": "OSL-3.0",
     "authors": [
         {
             "name": "Cyrill Schumacher",
