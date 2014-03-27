@@ -25,7 +25,9 @@ abstract class AbstractImpex extends AbstractMagentoCommand
     {
         $this
             ->setName('hs:ccd:xxx')
-            ->addOption('format', NULL, InputOption::VALUE_OPTIONAL, 'Format: yaml, json, json2, csv, xml, limeSodaXml', 'yaml');
+            ->addOption('format', 'fo', InputOption::VALUE_OPTIONAL, 'Format: yaml, json, json2, csv, xml, limeSodaXml', 'yaml')
+            ->addOption('hierarchical', 'hi', InputOption::VALUE_OPTIONAL,
+                'Create a hierarchical or a flat structure (not all export format supports that). Enable with: y', 'n');
     }
 
     /**
@@ -43,6 +45,25 @@ abstract class AbstractImpex extends AbstractMagentoCommand
         if (FALSE === $this->initMagento()) {
             throw new \RuntimeException('Magento could not be loaded');
         }
+    }
+
+    /**
+     * @param string $type
+     */
+    protected function _getFormatClass($type = 'Exporter')
+    {
+        $format      = $this->_input->getOption('format');
+        $class       = ucfirst($format);
+        $classPrefix = 'HarrisStreet\\CoreConfigData\\' . $type . '\\';
+
+        if (TRUE === class_exists($classPrefix . $class, TRUE)) {
+            $interfaces = class_implements($classPrefix . $class);
+            if (isset($interfaces[$classPrefix . $type . 'Interface'])) {
+                $c = $classPrefix . $class;
+                return new $c();
+            }
+        }
+        return FALSE;
     }
 
     /**

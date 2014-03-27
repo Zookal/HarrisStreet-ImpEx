@@ -10,6 +10,8 @@ abstract class AbstractExporter implements ExporterInterface
 {
     protected $_fileNameExtension = '';
 
+    private $_isHierarchical = FALSE;
+
     /**
      * @var \Varien_Data_Collection
      */
@@ -42,5 +44,89 @@ abstract class AbstractExporter implements ExporterInterface
     public function getFileNameExtension()
     {
         return $this->_fileNameExtension;
+    }
+
+    /**
+     * @param bool $isHierarchical
+     *
+     * @return $this
+     */
+    public function setIsHierarchical($isHierarchical)
+    {
+        $this->_isHierarchical = (boolean)$isHierarchical;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getIsHierarchical()
+    {
+        return $this->_isHierarchical;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function _prepareCollection()
+    {
+        $prepare = TRUE === $this->getIsHierarchical() ? '_prepareHierarchicalCollection' : '_prepareFlatCollection';
+        return $this->$prepare();
+    }
+
+    /**
+     * Hmmm
+     *
+     * @return array
+     * @throws \Exception
+     */
+    protected function _prepareHierarchicalCollection()
+    {
+        $return = array();
+        foreach ($this->_collection as $row) {
+            /** @var $row \Mage_Core_Model_Config_Data */
+
+            $pathDetails = explode('/', $row->getPath());
+
+            if (!isset($return[$pathDetails[0]])) {
+                $return[$pathDetails[0]] = array();
+            }
+            if (!isset($return[$pathDetails[0]][$pathDetails[1]])) {
+                $return[$pathDetails[0]][$pathDetails[1]] = array();
+            }
+            if (!isset($return[$pathDetails[0]][$pathDetails[1]][$pathDetails[2]])) {
+                $return[$pathDetails[0]][$pathDetails[1]][$pathDetails[2]] = array();
+            }
+            if (!isset($return[$pathDetails[0]][$pathDetails[1]][$pathDetails[2]][$row->getScope()])) {
+                $return[$pathDetails[0]][$pathDetails[1]][$pathDetails[2]][$row->getScope()] = array();
+            }
+
+            $return[$pathDetails[0]][$pathDetails[1]][$pathDetails[2]][$row->getScope()]['' . $row->getScopeId()] = $row->getValue();
+        }
+
+        return $return;
+    }
+
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    protected function _prepareFlatCollection()
+    {
+        $return = array();
+        foreach ($this->_collection as $row) {
+            /** @var $row \Mage_Core_Model_Config_Data */
+
+            if (!isset($return[$row->getPath()])) {
+                $return[$row->getPath()] = array();
+            }
+            if (!isset($return[$row->getPath()][$row->getScope()])) {
+                $return[$row->getPath()][$row->getScope()] = array();
+            }
+
+            $return[$row->getPath()][$row->getScope()]['' . $row->getScopeId()] = $row->getValue();
+        }
+
+        return $return;
     }
 }

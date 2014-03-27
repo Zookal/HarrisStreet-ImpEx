@@ -17,4 +17,13 @@ interface ExporterInterface
     public function getData();
 
     public function getFileNameExtension();
+
+    /**
+     * @param boolean $isHierarchical
+     *
+     * @return $this
+     */
+    public function setIsHierarchical($isHierarchical);
+
+    public function getIsHierarchical();
 }

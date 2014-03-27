@@ -2,6 +2,8 @@
 
 namespace HarrisStreet\CoreConfigData\Exporter;
 
+use Symfony\Component\Yaml\Dumper;
+
 /**
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @author      Cyrill at Schumacher dot fm [@SchumacherFM]
@@ -10,11 +12,19 @@ class Yaml extends AbstractExporter
 {
     public function getData()
     {
-        $configSet = $this->_prepareCollection();
-        return $this->_generateYaml($configSet);
+
+        if (TRUE === $this->getIsHierarchical()) {
+            $yaml = new Dumper();
+            return $yaml->dump($this->_prepareHierarchicalCollection(), 4, 0, FALSE, true);
+        } else {
+            $configSet = $this->_prepareFlatCollection();
+            return $this->_generateYaml($configSet);
+        }
     }
 
     /**
+     * Custom format with nice headers only for flat structure available
+     *
      * @param array $data
      *
      * @return string
@@ -75,32 +85,5 @@ class Yaml extends AbstractExporter
         }
 
         return '\'' . addcslashes($value, '\'') . '\'';
-    }
-
-    /**
-     * @return array
-     * @throws \Exception
-     */
-    protected function _prepareCollection()
-    {
-        $return = array();
-        foreach ($this->_collection as $row) {
-            /** @var $row \Mage_Core_Model_Config_Data */
-
-            if (!isset($return[$row->getPath()])) {
-                $return[$row->getPath()] = array();
-            }
-
-            if (!isset($return[$row->getPath()][$row->getScope()])) {
-                $return[$row->getPath()][$row->getScope()] = array();
-            }
-            if (!isset($return[$row->getPath()][$row->getScope()][$row->getScopeId()])) {
-                $return[$row->getPath()][$row->getScope()][$row->getScopeId()] = $row->getValue();
-            } else {
-                throw new \Exception('Duplicate values are forbidden. Check your core_config_data table!');
-            }
-        }
-
-        return $return;
     }
 }

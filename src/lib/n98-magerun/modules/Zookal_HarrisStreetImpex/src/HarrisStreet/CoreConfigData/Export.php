@@ -21,11 +21,11 @@ class Export extends AbstractImpex
         parent::configure();
         $this
             ->setName('hs:ccd:export')
-            ->addOption('filename', NULL, InputOption::VALUE_OPTIONAL, 'File name into which should the export be written. Defaults into var directory.')
-            ->addOption('include', NULL, InputOption::VALUE_OPTIONAL, 'Path prefix, multiple values can be comma separated; exports only those paths')
-            ->addOption('exclude', NULL, InputOption::VALUE_OPTIONAL, 'Path prefix, multiple values can be comma separated; exports everything except ...')
+            ->addOption('filename', 'fn', InputOption::VALUE_OPTIONAL, 'File name into which should the export be written. Defaults into var directory.')
+            ->addOption('include', 'in', InputOption::VALUE_OPTIONAL, 'Path prefix, multiple values can be comma separated; exports only those paths')
+            ->addOption('exclude', 'ex', InputOption::VALUE_OPTIONAL, 'Path prefix, multiple values can be comma separated; exports everything except ...')
             ->addOption('filePerNameSpace', NULL, InputOption::VALUE_OPTIONAL,
-                'Export each namespace into its own file. Set to: yes', 'no')
+                'Export each namespace into its own file. Enable with: y', 'n')
             ->addOption('exclude-default', NULL, InputOption::VALUE_OPTIONAL, 'Excludes default values (@todo)')
             ->setDescription('HarrisStreet: Exports Core_Config_Data settings into a file.');
     }
@@ -40,12 +40,15 @@ class Export extends AbstractImpex
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         parent::execute($input, $output);
+
         $this->_exporterInstance = $this->_getFormatClass();
+
         if (FALSE === $this->_exporterInstance) {
             throw new \InvalidArgumentException('No supported export format!');
         }
 
-        if ('yes' === $input->getOption('filePerNameSpace')) {
+        $this->_exporterInstance->setIsHierarchical('y' === $input->getOption('hierarchical'));
+        if ('y' === $input->getOption('filePerNameSpace')) {
             return $this->_createMultipleFiles();
         }
 
@@ -82,25 +85,6 @@ class Export extends AbstractImpex
         }
         $this->_output->writeln('<info>Wrote: ' . $collection->count() . ' settings to file ' . $fileName . '</info>');
         return 0;
-    }
-
-    /**
-     * @return bool|ExporterInterface
-     */
-    protected function _getFormatClass()
-    {
-        $format      = $this->_input->getOption('format');
-        $class       = ucfirst($format);
-        $classPrefix = 'HarrisStreet\\CoreConfigData\\Exporter\\';
-
-        if (TRUE === class_exists($classPrefix . $class, TRUE)) {
-            $interfaces = class_implements($classPrefix . $class);
-            if (isset($interfaces[$classPrefix . 'ExporterInterface'])) {
-                $c = $classPrefix . $class;
-                return new $c();
-            }
-        }
-        return FALSE;
     }
 
     /**
