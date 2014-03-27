@@ -25,8 +25,8 @@ abstract class AbstractImpex extends AbstractMagentoCommand
     {
         $this
             ->setName('hs:ccd:xxx')
-            ->addOption('format', 'fo', InputOption::VALUE_OPTIONAL, 'Format: yaml, json, csv, xml, limeSodaXml', 'yaml')
-            ->addOption('hierarchical', 'hi', InputOption::VALUE_OPTIONAL,
+            ->addOption('format', 'm', InputOption::VALUE_OPTIONAL, 'Format: yaml, json, csv, xml, limeSodaXml', 'yaml')
+            ->addOption('hierarchical', 'a', InputOption::VALUE_OPTIONAL,
                 'Create a hierarchical or a flat structure (not all export format supports that). Enable with: y', 'n');
     }
 

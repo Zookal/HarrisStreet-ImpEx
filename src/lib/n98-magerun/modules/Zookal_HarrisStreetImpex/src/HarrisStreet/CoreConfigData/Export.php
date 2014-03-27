@@ -21,12 +21,12 @@ class Export extends AbstractImpex
         parent::configure();
         $this
             ->setName('hs:ccd:export')
-            ->addOption('filename', 'fn', InputOption::VALUE_OPTIONAL, 'File name into which should the export be written. Defaults into var directory.')
-            ->addOption('include', 'in', InputOption::VALUE_OPTIONAL, 'Path prefix, multiple values can be comma separated; exports only those paths')
-            ->addOption('exclude', 'ex', InputOption::VALUE_OPTIONAL, 'Path prefix, multiple values can be comma separated; exports everything except ...')
-            ->addOption('filePerNameSpace', NULL, InputOption::VALUE_OPTIONAL,
+            ->addOption('filename', 'f', InputOption::VALUE_OPTIONAL, 'File name into which should the export be written. Defaults into var directory.')
+            ->addOption('include', 'i', InputOption::VALUE_OPTIONAL, 'Path prefix, multiple values can be comma separated; exports only those paths')
+            ->addOption('exclude', 'x', InputOption::VALUE_OPTIONAL, 'Path prefix, multiple values can be comma separated; exports everything except ...')
+            ->addOption('filePerNameSpace', 's', InputOption::VALUE_OPTIONAL,
                 'Export each namespace into its own file. Enable with: y', 'n')
-            ->addOption('exclude-default', NULL, InputOption::VALUE_OPTIONAL, 'Excludes default values (@todo)')
+            ->addOption('exclude-default', 'c', InputOption::VALUE_OPTIONAL, 'Excludes default values (@todo)')
             ->setDescription('HarrisStreet: Exports Core_Config_Data settings into a file.');
     }
 
@@ -62,8 +62,24 @@ class Export extends AbstractImpex
      */
     protected function _createMultipleFiles()
     {
+        $collection = $this->_getExportCollection();
 
-        $this->_output->writeln('<info>Wrote: nothing</info>');
+        $subCollections = array();
+        foreach ($collection as $item) {
+            /** @var $item \Mage_Core_Model_Config_Data */
+            $nameSpaceParts = explode('/', $item->getPath());
+            $nameSpace      = $nameSpaceParts[0];
+            if (FALSE === isset($subCollections[$nameSpace])) {
+                $subCollections[$nameSpace] = new \Varien_Data_Collection();
+            }
+            $subCollections[$nameSpace]->addItem($item);
+        }
+
+        foreach ($subCollections as $nameSpace => $nameSpaceCollection) {
+            $this->_exporterInstance->setData($nameSpaceCollection);
+            $this->_writeFile($this->_getMultipleFilename($nameSpace), $nameSpaceCollection->count());
+        }
+
         return 0;
     }
 
@@ -77,13 +93,23 @@ class Export extends AbstractImpex
         $collection = $this->_getExportCollection();
         $this->_exporterInstance->setData($collection);
 
-        $fileName = $this->_getFileName();
-        $written  = file_put_contents($fileName, $this->_exporterInstance->getData());
+        return $this->_writeFile($this->_getFileName(), $collection->count());
+    }
+
+    /**
+     * @param string $fileName
+     * @param int    $count
+     *
+     * @return int
+     */
+    protected function _writeFile($fileName, $count)
+    {
+        $written = file_put_contents($fileName, $this->_exporterInstance->getData());
         if (FALSE === $written) {
             $this->_output->writeln('<error>Failed to write: ' . $fileName . '</error>');
             return 1;
         }
-        $this->_output->writeln('<info>Wrote: ' . $collection->count() . ' settings to file ' . $fileName . '</info>');
+        $this->_output->writeln('<info>Wrote: ' . $count . ' settings to file ' . $fileName . '</info>');
         return 0;
     }
 
@@ -102,5 +128,18 @@ class Export extends AbstractImpex
             ? $this->_input->getOption('format')
             : $this->_exporterInstance->getFileNameExtension();
         return \Mage::getBaseDir('var') . DIRECTORY_SEPARATOR . 'config_' . date('Ymd_His') . '.' . $ext;
+    }
+
+    /**
+     * @param string $nameSpace
+     *
+     * @return string
+     */
+    protected function _getMultipleFilename($nameSpace)
+    {
+        $fileName = $this->_getFileName();
+        $fnParts  = explode('.', $fileName);
+        $ext      = array_pop($fnParts);
+        return implode('.', $fnParts) . '_' . $nameSpace . '.' . $ext;
     }
 }

@@ -22,7 +22,21 @@ This software is pre-alpha.
 
 ### Export
 
-...
+```
+$  ./n98-magerun.phar hs:ccd:export --help
+Usage:
+ hs:ccd:export [-m|--format[="..."]] [-a|--hierarchical[="..."]] [-f|--filename[="..."]] [-i|--include[="..."]] [-x|--exclude[="..."]] [-s|--filePerNameSpace[="..."]] [-c|--exclude-default[="..."]]
+
+Options:
+ --format (-m)           Format: yaml, json, csv, xml, limeSodaXml (default: "yaml")
+ --hierarchical (-a)     Create a hierarchical or a flat structure (not all export format supports that). Enable with: y (default: "n")
+ --filename (-f)         File name into which should the export be written. Defaults into var directory.
+ --include (-i)          Path prefix, multiple values can be comma separated; exports only those paths
+ --exclude (-x)          Path prefix, multiple values can be comma separated; exports everything except ...
+ --filePerNameSpace (-s) Export each namespace into its own file. Enable with: y (default: "n")
+ --exclude-default (-c)  Excludes default values (@todo)
+ --help (-h)             Display this help message.
+ ```
 
 
 ### Import
