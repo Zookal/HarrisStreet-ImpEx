@@ -5,14 +5,16 @@ interface ExporterInterface
 {
 
     /**
-     * @param \Mage_Core_Model_Resource_Config_Data_Collection $collection
+     * @param \Varien_Data_Collection $collection
      *
      * @return $this
      */
-    public function setData(\Mage_Core_Model_Resource_Config_Data_Collection $collection);
+    public function setData(\Varien_Data_Collection $collection);
 
     /**
      * @return string
      */
     public function getData();
+
+    public function getFileNameExtension();
 }

@@ -25,7 +25,7 @@ abstract class AbstractImpex extends AbstractMagentoCommand
     {
         $this
             ->setName('hs:ccd:xxx')
-            ->addOption('format', NULL, InputOption::VALUE_OPTIONAL, 'Format: yaml,json,csv,xml,limeSodaXml', 'yaml');
+            ->addOption('format', NULL, InputOption::VALUE_OPTIONAL, 'Format: yaml, json, json2, csv, xml, limeSodaXml', 'yaml');
     }
 
     /**
@@ -46,7 +46,7 @@ abstract class AbstractImpex extends AbstractMagentoCommand
     }
 
     /**
-     * @return \Mage_Core_Model_Resource_Config_Data_Collection
+     * @return \Varien_Data_Collection
      */
     protected function _getExportCollection()
     {

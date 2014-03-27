@@ -8,8 +8,10 @@ namespace HarrisStreet\CoreConfigData\Exporter;
  */
 abstract class AbstractExporter implements ExporterInterface
 {
+    protected $_fileNameExtension = '';
+
     /**
-     * @var \Mage_Core_Model_Resource_Config_Data_Collection
+     * @var \Varien_Data_Collection
      */
     protected $_collection = NULL;
 
@@ -17,7 +19,7 @@ abstract class AbstractExporter implements ExporterInterface
      * Run script
      *
      */
-    public function setData(\Mage_Core_Model_Resource_Config_Data_Collection $collection)
+    public function setData(\Varien_Data_Collection $collection)
     {
         $this->_collection = $collection;
         return $this;
@@ -32,5 +34,13 @@ abstract class AbstractExporter implements ExporterInterface
     {
         $str = str_replace(array("\r\n", "\n"), '\\n', $str);
         return addcslashes($str, '"');
+    }
+
+    /**
+     * @return string
+     */
+    public function getFileNameExtension()
+    {
+        return $this->_fileNameExtension;
     }
 }

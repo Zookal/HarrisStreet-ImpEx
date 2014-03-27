@@ -11,6 +11,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Export extends AbstractImpex
 {
+    /**
+     * @var ExporterInterface
+     */
+    protected $_exporterInstance = NULL;
+
     protected function configure()
     {
         parent::configure();
@@ -19,8 +24,10 @@ class Export extends AbstractImpex
             ->addOption('filename', NULL, InputOption::VALUE_OPTIONAL, 'File name into which should the export be written. Defaults into var directory.')
             ->addOption('include', NULL, InputOption::VALUE_OPTIONAL, 'Path prefix, multiple values can be comma separated; exports only those paths')
             ->addOption('exclude', NULL, InputOption::VALUE_OPTIONAL, 'Path prefix, multiple values can be comma separated; exports everything except ...')
+            ->addOption('filePerNameSpace', NULL, InputOption::VALUE_OPTIONAL,
+                'Export each namespace into its own file. Set to: yes', 'no')
             ->addOption('exclude-default', NULL, InputOption::VALUE_OPTIONAL, 'Excludes default values (@todo)')
-            ->setDescription('Exports Core_Config_Data settings into a file.');
+            ->setDescription('HarrisStreet: Exports Core_Config_Data settings into a file.');
     }
 
     /**
@@ -33,16 +40,42 @@ class Export extends AbstractImpex
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         parent::execute($input, $output);
-        $exporterInstance = $this->_getFormatClass();
-        if (FALSE === $exporterInstance) {
+        $this->exporterInstance = $this->_getFormatClass();
+        if (FALSE === $this->_exporterInstance) {
             throw new \InvalidArgumentException('Not supported export format!');
         }
 
+        if ('yes' === $input->getOption('filePerNameSpace')) {
+            return $this->_createMultipleFiles();
+        }
+
+        return $this->_createSingleFile();
+    }
+
+    /**
+     * Exports one file per namespace
+     *
+     * @return int
+     */
+    protected function _createMultipleFiles()
+    {
+
+        $this->_output->writeln('<info>Wrote: nothing</info>');
+        return 0;
+    }
+
+    /**
+     * Exports everything in one file
+     *
+     * @return int
+     */
+    protected function _createSingleFile()
+    {
         $collection = $this->_getExportCollection();
-        $exporterInstance->setData($collection);
+        $this->_exporterInstance->setData($collection);
 
         $fileName = $this->_getFileName();
-        $written  = file_put_contents($fileName, $exporterInstance->getData());
+        $written  = file_put_contents($fileName, $this->_exporterInstance->getData());
         if (FALSE === $written) {
             $this->_output->writeln('<error>Failed to write: ' . $fileName . '</error>');
             return 1;
@@ -80,7 +113,10 @@ class Export extends AbstractImpex
         if (FALSE === empty($fileName)) {
             return $fileName;
         }
-        $format = $this->_input->getOption('format');
-        return \Mage::getBaseDir('var') . DIRECTORY_SEPARATOR . 'config_' . date('Ymd_His') . '.' . $format;
+
+        $ext = '' === $this->_exporterInstance->getFileNameExtension()
+            ? $this->_input->getOption('format')
+            : $exporterInstance->getFileNameExtension();
+        return \Mage::getBaseDir('var') . DIRECTORY_SEPARATOR . 'config_' . date('Ymd_His') . '.' . $ext;
     }
 }

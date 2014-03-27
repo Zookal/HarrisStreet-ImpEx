@@ -16,7 +16,7 @@ class Import extends AbstractImpex
         $this
             ->setName('hs:ccd:import')
             ->addArgument('env', InputArgument::REQUIRED, 'Environment name')
-            ->setDescription('Import and update Core_Config_Data settings and data for environment');
+            ->setDescription('HarrisStreet: Import and update Core_Config_Data settings and data for environment');
     }
 
     /**

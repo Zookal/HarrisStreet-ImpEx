@@ -9,6 +9,7 @@ namespace HarrisStreet\CoreConfigData\Exporter;
  */
 class LimeSodaXml extends AbstractExporter
 {
+    protected $_fileNameExtension = 'xml';
 
     public function getData()
     {
