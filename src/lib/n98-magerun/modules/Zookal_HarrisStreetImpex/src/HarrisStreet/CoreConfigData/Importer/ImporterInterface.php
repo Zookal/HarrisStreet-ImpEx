@@ -1,5 +1,5 @@
 <?php
-namespace HarrisStreet\CoreConfigData\Exporter;
+namespace HarrisStreet\CoreConfigData\Importer;
 
 interface ImporterInterface
 {
