@@ -5,11 +5,20 @@ interface ImporterInterface
 {
 
     /**
-     * @param \Mage_Core_Model_Resource_Config_Data_Collection $collection
+     * @param \Varien_Data_Collection $collection
      *
      * @return $this
      */
-    public function setData(\Mage_Core_Model_Resource_Config_Data_Collection $collection);
+    public function setData(\Varien_Data_Collection $collection);
 
     public function import();
+
+    /**
+     * @param boolean $isHierarchical
+     *
+     * @return $this
+     */
+    public function setIsHierarchical($isHierarchical);
+
+    public function getIsHierarchical();
 }
