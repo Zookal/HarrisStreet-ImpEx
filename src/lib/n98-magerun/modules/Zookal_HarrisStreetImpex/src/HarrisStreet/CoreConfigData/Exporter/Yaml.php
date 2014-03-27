@@ -15,7 +15,8 @@ class Yaml extends AbstractExporter
 
         if (TRUE === $this->getIsHierarchical()) {
             $yaml = new Dumper();
-            return $yaml->dump($this->_prepareHierarchicalCollection(), 4, 0, FALSE, true);
+            $yaml->setIndentation(2);
+            return $yaml->dump($this->_prepareHierarchicalCollection(), 5, 0, FALSE, TRUE);
         } else {
             $configSet = $this->_prepareFlatCollection();
             return $this->_generateYaml($configSet);
