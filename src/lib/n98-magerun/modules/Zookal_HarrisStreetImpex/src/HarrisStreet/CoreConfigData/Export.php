@@ -40,9 +40,9 @@ class Export extends AbstractImpex
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         parent::execute($input, $output);
-        $this->exporterInstance = $this->_getFormatClass();
+        $this->_exporterInstance = $this->_getFormatClass();
         if (FALSE === $this->_exporterInstance) {
-            throw new \InvalidArgumentException('Not supported export format!');
+            throw new \InvalidArgumentException('No supported export format!');
         }
 
         if ('yes' === $input->getOption('filePerNameSpace')) {
@@ -116,7 +116,7 @@ class Export extends AbstractImpex
 
         $ext = '' === $this->_exporterInstance->getFileNameExtension()
             ? $this->_input->getOption('format')
-            : $exporterInstance->getFileNameExtension();
+            : $this->_exporterInstance->getFileNameExtension();
         return \Mage::getBaseDir('var') . DIRECTORY_SEPARATOR . 'config_' . date('Ymd_His') . '.' . $ext;
     }
 }
