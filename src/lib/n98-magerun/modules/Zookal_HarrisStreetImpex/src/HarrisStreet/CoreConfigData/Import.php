@@ -1,4 +1,9 @@
 <?php
+/**
+ * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright   2014-present Zookal Pty Ltd, Sydney, Australia
+ * @author      Cyrill at Schumacher dot fm [@SchumacherFM]
+ */
 
 namespace HarrisStreet\CoreConfigData;
 
@@ -41,16 +46,21 @@ class Import extends AbstractImpex
     /**
      * Imports a bunch of files. The last imported file will always overwrite the settings from the previous one
      *
-     * @param \Symfony\Component\Console\Input\InputInterface   $input
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param InputInterface  $input
+     * @param OutputInterface $output
      *
-     * @return int|void
+     * @return int|null|void
+     * @throws \InvalidArgumentException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         parent::execute($input, $output);
 
         $this->_importerInstance = $this->_getFormatClass('Importer');
+
+        if (FALSE === $this->_importerInstance) {
+            throw new \InvalidArgumentException('No supported import format found!');
+        }
 
         $this->_setFolder($input->getArgument('folder'));
         $this->_setEnvironment($input->getArgument('env'));

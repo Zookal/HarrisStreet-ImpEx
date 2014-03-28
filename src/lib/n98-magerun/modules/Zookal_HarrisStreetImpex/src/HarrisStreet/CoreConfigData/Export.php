@@ -1,4 +1,9 @@
 <?php
+/**
+ * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright   2014-present Zookal Pty Ltd, Sydney, Australia
+ * @author      Cyrill at Schumacher dot fm [@SchumacherFM]
+ */
 
 namespace HarrisStreet\CoreConfigData;
 
@@ -44,7 +49,7 @@ class Export extends AbstractImpex
         $this->_exporterInstance = $this->_getFormatClass();
 
         if (FALSE === $this->_exporterInstance) {
-            throw new \InvalidArgumentException('No supported export format!');
+            throw new \InvalidArgumentException('No supported export format found!');
         }
 
         $this->_exporterInstance->setIsHierarchical('y' === $input->getOption('hierarchical'));
