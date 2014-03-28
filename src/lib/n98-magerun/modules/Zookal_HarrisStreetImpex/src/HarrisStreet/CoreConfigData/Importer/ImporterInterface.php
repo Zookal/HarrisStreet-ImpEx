@@ -5,13 +5,11 @@ interface ImporterInterface
 {
 
     /**
-     * @param \Varien_Data_Collection $collection
+     * @param string $fileName
      *
-     * @return $this
+     * @return array
      */
-    public function setData(\Varien_Data_Collection $collection);
-
-    public function import();
+    public function parse($fileName);
 
     /**
      * @param boolean $isHierarchical

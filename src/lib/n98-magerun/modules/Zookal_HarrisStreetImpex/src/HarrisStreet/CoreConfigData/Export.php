@@ -124,10 +124,7 @@ class Export extends AbstractImpex
             return $fileName;
         }
 
-        $ext = '' === $this->_exporterInstance->getFileNameExtension()
-            ? $this->_input->getOption('format')
-            : $this->_exporterInstance->getFileNameExtension();
-        return \Mage::getBaseDir('var') . DIRECTORY_SEPARATOR . 'config_' . date('Ymd_His') . '.' . $ext;
+        return \Mage::getBaseDir('var') . DIRECTORY_SEPARATOR . 'config_' . date('Ymd_His') . '.' . $this->_exporterInstance->getFileNameExtension();
     }
 
     /**

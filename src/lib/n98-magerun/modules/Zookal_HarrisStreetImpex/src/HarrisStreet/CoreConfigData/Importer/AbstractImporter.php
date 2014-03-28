@@ -2,29 +2,16 @@
 
 namespace HarrisStreet\CoreConfigData\Importer;
 
+use HarrisStreet\CoreConfigData\AbstractImpexFileExtension;
+
 /**
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @author      Cyrill at Schumacher dot fm [@SchumacherFM]
  */
-abstract class AbstractImporter implements ImporterInterface
+abstract class AbstractImporter extends AbstractImpexFileExtension implements ImporterInterface
 {
 
     private $_isHierarchical = FALSE;
-
-    /**
-     * @var \Varien_Data_Collection
-     */
-    protected $_collection = NULL;
-
-    /**
-     * Run script
-     *
-     */
-    public function setData(\Varien_Data_Collection $collection)
-    {
-        $this->_collection = $collection;
-        return $this;
-    }
 
     /**
      * @param bool $isHierarchical

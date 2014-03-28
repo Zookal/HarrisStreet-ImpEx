@@ -39,6 +39,8 @@ class Import extends AbstractImpex
     }
 
     /**
+     * Imports a bunch of files. The last imported file will always overwrite the settings from the previous one
+     *
      * @param \Symfony\Component\Console\Input\InputInterface   $input
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      *
@@ -53,25 +55,53 @@ class Import extends AbstractImpex
         $this->_setFolder($input->getArgument('folder'));
         $this->_setEnvironment($input->getArgument('env'));
 
-        $baseFiles = $this->_getConfigurationBaseFiles();
-        $envFiles  = $this->_getConfigurationEnvFiles();
-
-        var_dump([$this->_folder, $this->_environment, $baseFiles, $envFiles]);
-        exit;
+        $configFiles = array_merge($this->_getConfigurationBaseFiles(), $this->_getConfigurationEnvFiles());
 
         $this->getApplication()->setAutoExit(FALSE);
 
-        $variables = $helper->getVariables($environment);
-        $search    = array_keys($variables);
-        $replace   = array_values($variables);
+        foreach ($configFiles as $file) {
 
-        foreach ($helper->getCommands($environment) as $command) {
-            $value = str_replace($search, $replace, strval($command));
-            $input = new StringInput($value);
-            $this->getApplication()->run($input, $output);
+            $configurations = $this->_importerInstance->parse($file);
+            /**
+             *  'catalog/downloadable/samples_title' =>     $path
+             *   array(1) {                                 $config
+             *     'default' =>
+             *     array(1) {
+             *       [0] =>
+             *       string(7) "Samples"
+             *     }
+             *   }
+             */
+            foreach ($configurations as $path => $config) {
+                $commands = $this->_getN98ConfigSets($path, $config);
+                foreach ($commands as $command) {
+                    $this->getApplication()->run(new StringInput($command), $output);
+                }
+            }
+            $this->_output->writeln('<info>Processed: ' . $file . ' with ' . count($configurations) . ' values.</info>');
         }
 
         $this->getApplication()->setAutoExit(TRUE);
+    }
+
+    /**
+     * @param string $path
+     * @param array  $config
+     *
+     * @return array
+     */
+    protected function _getN98ConfigSets($path, array $config)
+    {
+        $return = array();
+        foreach ($config as $scope => $scopeIdValue) {
+            foreach ($scopeIdValue as $scopeId => $value) {
+                $scopeId  = (int)$scopeId;
+                $value    = str_replace("\r", '', addcslashes($value, '"'));
+                $value    = str_replace("\n", '\\n', $value); // no multiline statements possible :-(
+                $return[] = 'config:set --scope=' . $scope . ' --scope-id=' . $scopeId . ' "' . $path . '" "' . $value . '"';
+            }
+        }
+        return $return;
     }
 
     /**
@@ -106,35 +136,67 @@ class Import extends AbstractImpex
     }
 
     /**
-     * a file is a Symfony\Component\Finder\SplFileInfo
      *
-     * @return Finder
+     * @return array
      * @throws \InvalidArgumentException
      */
     protected function _getConfigurationBaseFiles()
     {
-        $format = $this->_input->getOption('format');
+        $files = $this->_find($this->_folder . DIRECTORY_SEPARATOR . $this->_getBaseFolderName() . DIRECTORY_SEPARATOR);
+        if (0 === count($files)) {
+            $extension = $this->_importerInstance->getFileNameExtension();
+            throw new \InvalidArgumentException('No base files found for format: *.' . $extension);
+        }
+        return $files;
+    }
 
-        $finder = new Finder();
+    /**
+     * @return array
+     * @throws \InvalidArgumentException
+     */
+    protected function _getConfigurationEnvFiles()
+    {
+
+        $fullEnvPath = '';
+        $files       = array();
+        foreach ($this->_environment as $envPath) {
+            $fullEnvPath .= $envPath . DIRECTORY_SEPARATOR;
+            $find  = $this->_find($this->_folder . DIRECTORY_SEPARATOR . $fullEnvPath, '0');
+            $files = array_merge($files, $find);
+        }
+
+        if (0 === count($files)) {
+            $extension = $this->_importerInstance->getFileNameExtension();
+            throw new \InvalidArgumentException('No env files found for format: *.' . $extension);
+        }
+        return $files;
+    }
+
+    /**
+     * @param string $path
+     * @param null   $depth
+     *
+     * @return array
+     */
+    protected function _find($path, $depth = NULL)
+    {
+        $extension = $this->_importerInstance->getFileNameExtension();
+        $finder    = new Finder();
         $finder
             ->files()
             ->ignoreUnreadableDirs()
-            ->name('*.' . $format)
+            ->name('*.' . $extension)
             ->followLinks()
-            ->in($this->_folder . DIRECTORY_SEPARATOR . $this->_getBaseFolderName() . DIRECTORY_SEPARATOR);
+            ->in($path);
 
-        if (0 === $finder->count()) {
-            throw new \InvalidArgumentException('No base files found for format: *.' . $format);
+        if (NULL !== $depth) {
+            $finder->depth($depth);
         }
-        return $finder;
-    }
 
-    protected function _getConfigurationEnvFiles()
-    {
-        $format = $this->_input->getOption('format');
-        $files  = glob($this->_folder . DIRECTORY_SEPARATOR . $this->_getBaseFolderName() . DIRECTORY_SEPARATOR . '*.' . $format);
-        if (0 === count($files)) {
-            throw new \InvalidArgumentException('No env files found for format: *.' . $format);
+        $files = array();
+        foreach ($finder as $file) {
+            /** @var $file \Symfony\Component\Finder\SplFileInfo */
+            $files[] = $file->getPathname();
         }
         return $files;
     }
