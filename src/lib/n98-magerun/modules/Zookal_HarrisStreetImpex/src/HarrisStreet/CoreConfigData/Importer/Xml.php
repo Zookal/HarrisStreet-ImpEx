@@ -7,20 +7,20 @@
 
 namespace HarrisStreet\CoreConfigData\Importer;
 
-use Symfony\Component\Yaml\Yaml as SymfonyYaml;
-
-class Yaml extends AbstractImporter
+class Xml extends AbstractImporter
 {
     /**
-     * Detects hierarchical structure so even a mixed file is possible
      *
      * @param string $fileName
      *
      * @return array
+     * @throws \Exception
      */
     public function parse($fileName)
     {
-        $content = SymfonyYaml::parse($fileName);
-        return $this->_normalize($content);
+
+        throw new \Exception('@todo XML importer');
+
+        return array();
     }
 }

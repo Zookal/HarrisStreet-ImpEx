@@ -7,9 +7,7 @@
 
 namespace HarrisStreet\CoreConfigData\Importer;
 
-use Symfony\Component\Yaml\Yaml as SymfonyYaml;
-
-class Yaml extends AbstractImporter
+class Json extends AbstractImporter
 {
     /**
      * Detects hierarchical structure so even a mixed file is possible
@@ -17,10 +15,16 @@ class Yaml extends AbstractImporter
      * @param string $fileName
      *
      * @return array
+     * @throws \InvalidArgumentException
      */
     public function parse($fileName)
     {
-        $content = SymfonyYaml::parse($fileName);
+        $content = json_decode(file_get_contents($fileName), TRUE);
+
+        if (0 !== json_last_error()) {
+            throw new \InvalidArgumentException('Could not parse JSON file: ' . $fileName . '. ' . json_last_error_msg());
+        }
+
         return $this->_normalize($content);
     }
 }

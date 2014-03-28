@@ -32,4 +32,38 @@ abstract class AbstractImporter extends AbstractImpexFileExtension implements Im
     {
         return $this->_isHierarchical;
     }
+
+    protected function  _normalize(array $content)
+    {
+        $return = array();
+        // try to detect hierarchical structure
+        foreach ($content as $nameSpace => $settings) {
+            if (strpos($nameSpace, '/') === FALSE) {
+                $cfgValues = $this->_flatten($nameSpace, $settings);
+                $return    = array_merge($return, $cfgValues);
+            } else {
+                $return[$nameSpace] = $settings;
+            }
+        }
+        return $return;
+    }
+
+    /**
+     * @param string $nameSpace1
+     * @param array  $settings1
+     *
+     * @return array
+     */
+    protected function _flatten($nameSpace1, array $settings1)
+    {
+
+        $return = array();
+        foreach ($settings1 as $nameSpace2 => $settings2) {
+            foreach ($settings2 as $nameSpace3 => $settings3) {
+                $return[$nameSpace1 . '/' . $nameSpace2 . '/' . $nameSpace3] = $settings3;
+            }
+        }
+
+        return $return;
+    }
 }

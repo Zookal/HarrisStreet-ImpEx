@@ -70,7 +70,7 @@ class Import extends AbstractImpex
         $this->getApplication()->setAutoExit(FALSE);
 
         foreach ($configFiles as $file) {
-
+            $valuesSet      = 0;
             $configurations = $this->_importerInstance->parse($file);
             /**
              *  'catalog/downloadable/samples_title' =>     $path
@@ -86,9 +86,10 @@ class Import extends AbstractImpex
                 $commands = $this->_getN98ConfigSets($path, $config);
                 foreach ($commands as $command) {
                     $this->getApplication()->run(new StringInput($command), $output);
+                    $valuesSet++;
                 }
             }
-            $this->_output->writeln('<info>Processed: ' . $file . ' with ' . count($configurations) . ' values.</info>');
+            $this->_output->writeln('<info>Processed: ' . $file . ' with ' . $valuesSet . ' value' . ($valuesSet < 2 ? '' : 's') . '.</info>');
         }
 
         $this->getApplication()->setAutoExit(TRUE);
