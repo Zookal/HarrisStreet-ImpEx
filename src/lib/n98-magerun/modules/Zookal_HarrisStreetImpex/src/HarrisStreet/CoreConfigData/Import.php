@@ -38,13 +38,14 @@ class Import extends AbstractImpex
         $this
             ->setName('hs:ccd:import')
             ->addArgument('folder', InputArgument::REQUIRED, 'Import folder name')
-            ->addArgument('env', InputArgument::REQUIRED, 'Environment name. SubEnvs separated by slash: development/developer01')
+            ->addArgument('env', InputArgument::REQUIRED, 'Environment name. SubEnvs separated by slash e.g.: development/osx/developer01')
             ->addOption('base', NULL, InputOption::VALUE_OPTIONAL, 'Base folder name', 'base')
             ->setDescription('HarrisStreet: Import and update Core_Config_Data settings for an environment');
     }
 
     /**
-     * Imports a bunch of files. The last imported file will always overwrite the settings from the previous one
+     * Imports a bunch of files. The last imported file will always overwrite the settings from the previous one.
+     * Environment folder names can have a hierarchical structure.
      *
      * @param InputInterface  $input
      * @param OutputInterface $output
