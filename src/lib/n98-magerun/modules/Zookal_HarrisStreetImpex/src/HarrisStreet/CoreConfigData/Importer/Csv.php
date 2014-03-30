@@ -30,7 +30,18 @@ class Csv extends AbstractImporter
      */
     public function parse($fileName)
     {
-        $csvIterator = new CsvIterator($fileName, ';');
+        $csvIterator = $this->_getCsvIterator($fileName, ';');
+
+        return $this->_normalize($this->_normalizeFile($csvIterator));
+    }
+
+    /**
+     * @param CsvIterator $csvIterator
+     *
+     * @return array
+     */
+    protected function _normalizeFile(CsvIterator $csvIterator)
+    {
 
         /**
          *  'catalog/downloadable/samples_title' =>     $path
@@ -56,6 +67,19 @@ class Csv extends AbstractImporter
             }
             $content[$row[0]][$row[1]][$row[2]] = $row[3];
         }
-        return $this->_normalize($content);
+        return $content;
+    }
+
+    /**
+     * @param  string $fileName
+     * @param string  $delimiter
+     * @param string  $enclosure
+     * @param string  $escape
+     *
+     * @return CsvIterator
+     */
+    protected function _getCsvIterator($fileName, $delimiter = ',', $enclosure = '"', $escape = '\\')
+    {
+        return new CsvIterator($fileName, $delimiter, $enclosure, $escape);
     }
 }
