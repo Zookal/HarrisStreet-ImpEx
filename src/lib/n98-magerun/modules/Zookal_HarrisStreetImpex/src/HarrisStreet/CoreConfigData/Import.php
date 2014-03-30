@@ -66,11 +66,9 @@ class Import extends AbstractImpex
         $this->_setFolder($input->getArgument('folder'));
         $this->_setEnvironment($input->getArgument('env'));
 
-        $configFiles = array_merge($this->_getConfigurationBaseFiles(), $this->_getConfigurationEnvFiles());
-
         $this->getApplication()->setAutoExit(FALSE);
 
-        foreach ($configFiles as $file) {
+        foreach ($this->_getConfigurationFiles() as $file) {
             $valuesSet      = 0;
             $configurations = $this->_importerInstance->parse($file);
             /**
@@ -148,6 +146,14 @@ class Import extends AbstractImpex
     }
 
     /**
+     * @return array
+     */
+    protected function _getConfigurationFiles()
+    {
+        return array_merge($this->_getConfigurationBaseFiles(), $this->_getConfigurationEnvFiles());
+    }
+
+    /**
      *
      * @return array
      * @throws \InvalidArgumentException
@@ -213,6 +219,9 @@ class Import extends AbstractImpex
         return $files;
     }
 
+    /**
+     * @return string
+     */
     protected function _getBaseFolderName()
     {
         return $this->_input->getOption('base');
