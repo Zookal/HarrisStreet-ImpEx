@@ -85,11 +85,39 @@ Options:
 
 #### Folder setup
 
-| Printscreen | Description |
-| ------------| ----------- |
-| image       | todo|
+![Folder Structure](https://raw.githubusercontent.com/Zookal/HarrisStreet-ImpEx/master/doc/folderStructure.png "Folder Structure")
 
+An example import for the development environment of *cyrill* would like:
 
+```
+$ ./n98-magerun.phar hs:ccd:import ./configuration/newCoreConfigData development/cyrill
+```
+
+#### How does the import work?
+
+Focusing in the printscreen above on the folder: `configuration/newCoreConfigData` and our example import command.
+
+The importer expects always a base folder (also configurable via CLI option) where all default configuration options are store in n-files. It reads all those files and loads their settings into Magento.
+
+In the next step the importer loads all files from the `development` folder but non-resursive and loads that content into Magento. After that it jumps into the folder `cyrill` and loads there the files. Finished!
+
+The output looks like:
+
+```
+Processed: ./configuration/newCoreConfigData/base/contacts.yaml with 4 values.
+Processed: ./configuration/newCoreConfigData/base/crontab.yaml with 6 values.
+Processed: ./configuration/newCoreConfigData/base/currency.yaml with 11 values.
+Processed: ./configuration/newCoreConfigData/base/customer.yaml with 33 values.
+Processed: ./configuration/newCoreConfigData/base/design.yaml with 40 values.
+Processed: ./configuration/newCoreConfigData/base/dev.yaml with 14 values.
+Processed: ./configuration/newCoreConfigData/base/general.yaml with 15 values.
+Processed: ./configuration/newCoreConfigData/development/test_web.yaml with 36 values.
+Processed: ./configuration/newCoreConfigData/development/cyrill/test_web.yaml with 4 values.
+```
+
+You are totally free of naming the folders and files.
+
+The file format during import will be detected with its extension. `.yaml` works were as `.yml` won't.
 
 ## Installation
 
