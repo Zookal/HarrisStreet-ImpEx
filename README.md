@@ -1,7 +1,7 @@
 HarrisStreet ImpEx for Magento
 ===============================
 
-Import and Export of Magentos core_config_data table. Handling of different environments with inheritance.
+Import and Export of Magentos configuration stored in core_config_data table. Handling of different environments with inheritance.
 
 Supports multiple formats like:
 
@@ -12,18 +12,12 @@ Supports multiple formats like:
 - Yaml
 - ASCII [Text File formats – ASCII Delimited Text – Not CSV or TAB delimited text](https://ronaldduncan.wordpress.com/2009/10/31/text-file-formats-ascii-delimited-text-not-csv-or-tab-delimited-text/)
 
-At the moment the Yaml import format is the most supported. Other formats will follow soon.
+At the moment the Yaml import format is the most supported. CSV and JSON works also well.
 
-### Description
-
-This software is pre-alpha.
-
-@todo -> Create folder somewhere in your system. Hierarchical structure for different environments and developers.
-
-### Export
+## Export
 
 ```
-$  ./n98-magerun.phar hs:ccd:export --help
+$ ./n98-magerun.phar hs:ccd:export --help
 Usage:
  hs:ccd:export [-m|--format[="..."]] [-a|--hierarchical[="..."]] [-f|--filename[="..."]] [-i|--include[="..."]] [-x|--exclude[="..."]] [-s|--filePerNameSpace[="..."]] [-c|--exclude-default[="..."]]
 
@@ -38,17 +32,66 @@ Options:
  --help (-h)             Display this help message.
  ```
 
+#### Examples
 
-### Import
+Export hierarchical xml for the `general` and `tax` namespace:
 
+```
+$ ./n98-magerun.phar hs:ccd:export --format=xml --include=general,tax --hierarchical=y
+```
+
+Export all configuration settings each namespace into its own file starting with the prefix `test`:
+
+```
+$ ./n98-magerun.phar hs:ccd:export --filePerNameSpace=y --filename=test
+Wrote: 12 settings to file test_admin.yaml
+Wrote: 118 settings to file test_advanced.yaml
+Wrote: 18 settings to file test_bestsellerproductslider.yaml
+Wrote: 6 settings to file test_bss.yaml
+Wrote: 294 settings to file test_carriers.yaml
+Wrote: 61 settings to file test_catalog.yaml
+Wrote: 12 settings to file test_cataloginventory.yaml
+Wrote: 16 settings to file test_checkout.yaml
 ...
+```
 
-### Running tests
+## Import
 
-...
+To import a configuration you need a specific setup of folders in the filesystem.
 
-Installation
-------------
+```
+$ ./n98-magerun.phar hs:ccd:import --help
+Usage:
+ hs:ccd:import [-m|--format[="..."]] [-a|--hierarchical[="..."]] [--base[="..."]] folder environment
+
+Arguments:
+ folder                Import folder name
+ env                   Environment name. SubEnvs separated by slash e.g.: development/osx/developer01
+
+Options:
+ --format (-m)         Format: yaml, json, csv, xml, limeSodaXml (default: "yaml")
+ --hierarchical (-a)   Create a hierarchical or a flat structure (not all export format supports that). Enable with: y (default: "n")
+ --base                Base folder name (default: "base")
+ --help (-h)           Display this help message.
+ --quiet (-q)          Do not output any message.
+ --verbose (-v|vv|vvv) Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+ --version (-V)        Display this application version.
+ --ansi                Force ANSI output.
+ --no-ansi             Disable ANSI output.
+ --no-interaction (-n) Do not ask any interactive question.
+ --root-dir            Force magento root dir. No auto detection
+ --skip-config         Do not load any custom config.
+```
+
+#### Folder setup
+
+| Printscreen | Description |
+| ------------| ----------- |
+| image       | todo|
+
+
+
+## Installation
 
 Require this installer in your `composer.json` file:
 
