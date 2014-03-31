@@ -119,14 +119,13 @@ class Export extends AbstractImpex
     }
 
     /**
-     *
      * @return string
      */
     protected function _getFileName()
     {
         $fileName = $this->_input->getOption('filename');
         if (FALSE === empty($fileName)) {
-            return $fileName;
+            return $fileName . '.' . $this->_exporterInstance->getFileNameExtension();
         }
 
         return \Mage::getBaseDir('var') . DIRECTORY_SEPARATOR . 'config_' . date('Ymd_His') . '.' . $this->_exporterInstance->getFileNameExtension();
@@ -139,7 +138,7 @@ class Export extends AbstractImpex
      */
     protected function _getMultipleFilename($nameSpace)
     {
-        $fileName = $this->_getFileName();
+        $fileName = $this->_getFileName($nameSpace);
         $fnParts  = explode('.', $fileName);
         $ext      = array_pop($fnParts);
         return implode('.', $fnParts) . '_' . $nameSpace . '.' . $ext;
