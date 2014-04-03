@@ -119,6 +119,24 @@ You are totally free of naming the folders and files.
 
 The file format during import will be detected with its extension. `.yaml` works were as `.yml` won't.
 
+## Convert
+
+Is really useful to create a .magerun file from your configuration to process later that file on a server.
+
+```
+$ ./n98-magerun.phar help hs:ccd:convert
+Usage:
+ hs:ccd:convert [-m|--format[="..."]] [-a|--hierarchical[="..."]] [--base[="..."]] [--export-file[="..."]] folder env
+
+Arguments:
+ folder                Import folder name
+ env                   Environment name. SubEnvs separated by slash e.g.: development/osx/developer01
+
+Options:
+ --base                Base folder name (default: "base")
+ --export-file         File name in which the n98 commands shoud be written. If empty -> stdout
+```
+
 ## Installation
 
 Require this installer in your `composer.json` file:

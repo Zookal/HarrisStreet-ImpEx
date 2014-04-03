@@ -27,7 +27,7 @@ class Convert extends Import
         $this
             ->setName('hs:ccd:convert')
             ->addOption('export-file', null, InputOption::VALUE_OPTIONAL, 'File name in which the n98 commands shoud be written. If empty -> stdout')
-            ->setDescription('HarrisStreet: Converts your configuration from a file format into n98 format for later processing via run "script".');
+            ->setDescription('HarrisStreet: Converts your configuration from a file format into a .magerun format for later processing via run "script".');
 
         $help = <<<HELP
 Converts your configuration files into a n98 script command.
