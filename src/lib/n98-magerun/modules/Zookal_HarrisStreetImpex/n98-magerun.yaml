@@ -5,3 +5,4 @@ commands:
   customCommands:
     - HarrisStreet\CoreConfigData\Import
     - HarrisStreet\CoreConfigData\Export
+    - HarrisStreet\CoreConfigData\Convert

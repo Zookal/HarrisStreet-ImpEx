@@ -20,17 +20,17 @@ class Import extends AbstractImpex
     /**
      * @var string
      */
-    protected $_folder = NULL;
+    protected $_folder = null;
 
     /**
      * @var array
      */
-    protected $_environment = NULL;
+    protected $_environment = null;
 
     /**
      * @var ImporterInterface
      */
-    protected $_importerInstance = NULL;
+    protected $_importerInstance = null;
 
     protected function configure()
     {
@@ -39,7 +39,7 @@ class Import extends AbstractImpex
             ->setName('hs:ccd:import')
             ->addArgument('folder', InputArgument::REQUIRED, 'Import folder name')
             ->addArgument('env', InputArgument::REQUIRED, 'Environment name. SubEnvs separated by slash e.g.: development/osx/developer01')
-            ->addOption('base', NULL, InputOption::VALUE_OPTIONAL, 'Base folder name', 'base')
+            ->addOption('base', null, InputOption::VALUE_OPTIONAL, 'Base folder name', 'base')
             ->setDescription('HarrisStreet: Import and update Core_Config_Data settings for an environment');
     }
 
@@ -56,17 +56,26 @@ class Import extends AbstractImpex
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         parent::execute($input, $output);
+        $this->processImport();
+    }
 
+    /**
+     * Runs the importer
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function processImport()
+    {
         $this->_importerInstance = $this->_getFormatClass('Importer');
 
-        if (FALSE === $this->_importerInstance) {
+        if (false === $this->_importerInstance) {
             throw new \InvalidArgumentException('No supported import format found!');
         }
 
-        $this->_setFolder($input->getArgument('folder'));
-        $this->_setEnvironment($input->getArgument('env'));
+        $this->_setFolder($this->_input->getArgument('folder'));
+        $this->_setEnvironment($this->_input->getArgument('env'));
 
-        $this->getApplication()->setAutoExit(FALSE);
+        $this->getApplication()->setAutoExit(false);
 
         foreach ($this->_getConfigurationFiles() as $file) {
             $valuesSet      = 0;
@@ -84,14 +93,33 @@ class Import extends AbstractImpex
             foreach ($configurations as $path => $config) {
                 $commands = $this->_getN98ConfigSets($path, $config);
                 foreach ($commands as $command) {
-                    $this->getApplication()->run(new StringInput($command), $output);
+                    $this->processCommand($command);
                     $valuesSet++;
                 }
             }
-            $this->_output->writeln('<info>Processed: ' . $file . ' with ' . $valuesSet . ' value' . ($valuesSet < 2 ? '' : 's') . '.</info>');
+            $this->infoOutPut($file, $valuesSet);
         }
 
-        $this->getApplication()->setAutoExit(TRUE);
+        $this->getApplication()->setAutoExit(true);
+    }
+
+    /**
+     * @param string $file
+     * @param int    $valuesSet
+     */
+    protected function infoOutPut($file, $valuesSet = 0)
+    {
+        $this->_output->writeln('<info>Processed: ' . $file . ' with ' . $valuesSet . ' value' . ($valuesSet < 2 ? '' : 's') . '.</info>');
+    }
+
+    /**
+     * @param string $command
+     *
+     * @return int
+     */
+    protected function processCommand($command)
+    {
+        return $this->getApplication()->run(new StringInput($command), $this->_output);
     }
 
     /**
@@ -122,7 +150,7 @@ class Import extends AbstractImpex
      */
     protected function _setFolder($folder)
     {
-        if (FALSE === is_dir($folder) || FALSE === is_readable($folder)) {
+        if (false === is_dir($folder) || false === is_readable($folder)) {
             throw new \InvalidArgumentException('Cannot access folder: ' . $folder);
         }
         $this->_folder = rtrim($folder, '/');
@@ -138,7 +166,7 @@ class Import extends AbstractImpex
     protected function _setEnvironment($env)
     {
         $ef = $this->_folder . DIRECTORY_SEPARATOR . $env;
-        if (FALSE === is_dir($ef) || FALSE === is_readable($ef)) {
+        if (false === is_dir($ef) || false === is_readable($ef)) {
             throw new \InvalidArgumentException('Cannot access folders for environment: ' . $env);
         }
         $this->_environment = explode(DIRECTORY_SEPARATOR, trim($env, DIRECTORY_SEPARATOR));
@@ -196,7 +224,7 @@ class Import extends AbstractImpex
      *
      * @return array
      */
-    protected function _find($path, $depth = NULL)
+    protected function _find($path, $depth = null)
     {
         $extension = $this->_importerInstance->getFileNameExtension();
         $finder    = new Finder();
@@ -207,7 +235,7 @@ class Import extends AbstractImpex
             ->followLinks()
             ->in($path);
 
-        if (NULL !== $depth) {
+        if (null !== $depth) {
             $finder->depth($depth);
         }
 
