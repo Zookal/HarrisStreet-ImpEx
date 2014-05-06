@@ -11,6 +11,7 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "magento-hackathon/magento-composer-installer": "*"
+        "magento-hackathon/magento-composer-installer": "*",
+        "symfony/yaml": "*"
     }
 }
