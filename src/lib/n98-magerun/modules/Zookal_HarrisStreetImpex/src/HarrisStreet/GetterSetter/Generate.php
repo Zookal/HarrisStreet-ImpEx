@@ -117,7 +117,8 @@ class Generate extends AbstractMagentoCommand
 
     protected function getColumnType($columnType)
     {
-        $columnType = strtolower(preg_replace('~[^a-z]+~i', '', $columnType));
+        $cte        = explode('(', $columnType);
+        $columnType = strtolower($cte[0]);
         $typeMapper = array(
             'int'       => 'int',
             'tinyint'   => 'int',
