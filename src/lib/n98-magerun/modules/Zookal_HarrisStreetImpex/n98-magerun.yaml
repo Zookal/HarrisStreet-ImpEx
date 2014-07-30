@@ -1,8 +1,10 @@
 autoloaders:
   HarrisStreet\CoreConfigData: %module%/src
+  HarrisStreet\GetterSetter: %module%/src
 
 commands:
   customCommands:
     - HarrisStreet\CoreConfigData\Import
     - HarrisStreet\CoreConfigData\Export
     - HarrisStreet\CoreConfigData\Convert
+    - HarrisStreet\GetterSetter\Generate
