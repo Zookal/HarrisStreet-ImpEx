@@ -51,9 +51,8 @@ class Generate extends AbstractMagentoCommand
     {
         $this
             ->setName('hs:gs')
-            ->addArgument('classFileName', InputOption::VALUE_REQUIRED, 'Class File name into which should be written.')
             ->addArgument('modelName', InputOption::VALUE_REQUIRED, 'Model Name')
-            ->setDescription('HarrisStreet: Writing getter and setters into the class file for @methods. Temp urgent implementation :-(');
+            ->setDescription('Code annotations: Writing getter and setters into the class file for @methods.');
     }
 
     /**
@@ -71,8 +70,8 @@ class Generate extends AbstractMagentoCommand
         if (false === $this->initMagento()) {
             throw new \RuntimeException('Magento could not be loaded');
         }
-        $this->checkClassFileName();
         $this->checkModel();
+        $this->checkClassFileName();
         $this->initTableColumns();
         $this->writeToClassFile();
         $this->_output->writeln("Wrote getter and setter @methods into file: " . $this->_fileName);
@@ -149,10 +148,24 @@ class Generate extends AbstractMagentoCommand
         }
     }
 
+    protected function searchFullPath($filename)
+    {
+        $paths = explode(PATH_SEPARATOR, get_include_path());
+        foreach ($paths as $path) {
+            $fullPath = $path . DIRECTORY_SEPARATOR . $filename;
+            if (true === @file_exists($fullPath)) {
+                return $fullPath;
+            }
+        }
+        return false;
+    }
+
     protected function checkClassFileName()
     {
-        $this->_fileName = $this->_input->getArgument('classFileName');
-        if (false === file_exists($this->_fileName) || false === is_file($this->_fileName)) {
+        $fileName        = str_replace(' ', DIRECTORY_SEPARATOR, ucwords(str_replace('_', ' ', get_class($this->_mageModel)))) . '.php';
+        $this->_fileName = $this->searchFullPath($fileName);
+
+        if (false === $this->_fileName) {
             throw new \InvalidArgumentException('File not found: ' . $this->_fileName);
         }
     }
@@ -164,7 +177,7 @@ class Generate extends AbstractMagentoCommand
             throw new InvalidArgumentException('Model ' . $this->_input->getArgument('modelName') . ' not found!');
         }
 
-        $this->_mageModelTable = $this->_mageModel->getResource()->getMainTable();
+        $this->_mageModelTable = $this->_mageModel->getResource() ? $this->_mageModel->getResource()->getMainTable() : null;
         if (true === empty($this->_mageModelTable)) {
             throw new \InvalidArgumentException('Cannot find main table of model ' . $this->_input->getArgument('modelName'));
         }
