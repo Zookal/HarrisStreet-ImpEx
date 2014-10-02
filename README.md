@@ -3,6 +3,8 @@ HarrisStreet ImpEx for Magento
 
 Import and Export of Magentos configuration stored in core_config_data table. Handling of different environments with inheritance.
 
+There is an [awesome blogpost](http://magerun.net/harrisstreet-impex-for-magento/) from [@cmuench](https://twitter.com/cmuench) about this module!
+
 Supports multiple formats like:
 
 - CSV
