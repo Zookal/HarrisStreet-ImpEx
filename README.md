@@ -155,6 +155,13 @@ Or via modman:
 $ modman clone git@github.com:Zookal/HarrisStreet-ImpEx.git
 ```
 
+History
+-------
+
+### 1.0.0
+
+Initial release
+
 License
 -------
 
