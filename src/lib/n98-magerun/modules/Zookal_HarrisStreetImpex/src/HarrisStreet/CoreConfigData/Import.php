@@ -80,6 +80,7 @@ class Import extends AbstractImpex
         foreach ($this->_getConfigurationFiles() as $file) {
             $valuesSet      = 0;
             $configurations = $this->_importerInstance->parse($file);
+
             /**
              *  'catalog/downloadable/samples_title' =>     $path
              *   array(1) {                                 $config
@@ -91,7 +92,12 @@ class Import extends AbstractImpex
              *   }
              */
             foreach ($configurations as $path => $config) {
-                $commands = $this->_getN98ConfigSets($path, $config);
+                if ($path == 'commands/run') {
+                    $commands = $config;
+                } else {
+                    $commands = $this->_getN98ConfigSets($path, $config);
+                }
+
                 foreach ($commands as $command) {
                     $this->processCommand($command);
                     $valuesSet++;
