@@ -28,6 +28,7 @@ class Export extends AbstractImpex
             ->setName('hs:ccd:export')
             ->addOption('filename', 'f', InputOption::VALUE_OPTIONAL, 'File name into which should the export be written. Defaults into var directory.')
             ->addOption('include', 'i', InputOption::VALUE_OPTIONAL, 'Path prefix, multiple values can be comma separated; exports only those paths')
+            ->addOption('includeScope', null, InputOption::VALUE_OPTIONAL, 'Scope name, multiple values can be comma separated; exports only those scopes')
             ->addOption('exclude', 'x', InputOption::VALUE_OPTIONAL, 'Path prefix, multiple values can be comma separated; exports everything except ...')
             ->addOption('filePerNameSpace', 's', InputOption::VALUE_OPTIONAL,
                 'Export each namespace into its own file. Enable with: y', 'n')
