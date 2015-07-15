@@ -32,6 +32,12 @@ class Import extends AbstractImpex
      */
     protected $_importerInstance = null;
 
+    /** @var \Mage_Core_Model_Resource_Website_Collection  */
+    protected $_websites = null;
+
+    /** @var \Mage_Core_Model_Resource_Store_Collection  */
+    protected $_stores = null;
+
     protected function configure()
     {
         parent::configure();
@@ -139,13 +145,92 @@ class Import extends AbstractImpex
         $return = array();
         foreach ($config as $scope => $scopeIdValue) {
             foreach ($scopeIdValue as $scopeId => $value) {
-                $scopeId  = (int)$scopeId;
-                $value    = str_replace("\r", '', addcslashes($value, '"'));
-                $value    = str_replace("\n", '\\n', $value); // no multiline statements possible :-(
+                $scopeId = (int)$scopeId;
+                $valid = $this->isValidScopeIdCombination($scope, $scopeId);
+                if (!$valid) {
+                    // Invalid scope write error to output
+                    $msg = "<error>ERROR: invalid scopeId: $scopeId for scope $scope</error>\n";
+                    $msg .= "<error>$path => $value</error>";
+                    $this->_output->writeln($msg);
+                    continue;
+                }
+
+                // Valid scope Write output
+                $value = str_replace("\r", '', addcslashes($value, '"'));
+                $value = str_replace("\n", '\\n', $value); // no multiline statements possible :-(
                 $return[] = 'config:set --scope=' . $scope . ' --scope-id=' . $scopeId . ' "' . $path . '" "' . $value . '"';
             }
         }
+
         return $return;
+    }
+
+
+    /**
+     * @param string $scope
+     * @param int    $scopeId
+     *
+     * @return bool
+     */
+    protected function isValidScopeIdCombination($scope, $scopeId)
+    {
+        $valid = true;
+        if ($scope === 'default') {
+            // Default Store only valid for id 0
+            if ($scopeId !== 0) {
+                $valid = false;
+            }
+        }
+        elseif ($scope === 'websites') {
+            // Check if website with id exists
+            $valid = $this->isValidWebsiteId($scopeId);
+        }
+        elseif ($scope === 'stores') {
+            // Check if store with id exists
+            $valid = $this->isValidStoreId($scopeId);
+        }
+
+        return $valid;
+    }
+
+    /**
+     * @param int $websiteId
+     *
+     * @return bool
+     */
+    protected function isValidWebsiteId($websiteId)
+    {
+        $website = $this->getWebsites()->getItemById($websiteId);
+
+        if ($website === null) {
+            return false;
+        }
+
+        if (!$website->getId()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param int $storeId
+     *
+     * @return bool
+     */
+    protected function isValidStoreId($storeId)
+    {
+        $store = $this->getStores()->getItemById($storeId) ;
+
+        if ($store === null) {
+            return false;
+        }
+
+        if (!$store->getId()) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -259,5 +344,29 @@ class Import extends AbstractImpex
     protected function _getBaseFolderName()
     {
         return $this->_input->getOption('base');
+    }
+
+    /**
+     * @return \Mage_Core_Model_Resource_Website_Collection
+     */
+    public function getWebsites()
+    {
+        if ($this->_websites === null) {
+            $this->_websites = \Mage::getResourceModel('core/website_collection');
+        }
+
+        return $this->_websites;
+    }
+
+    /**
+     * @return \Mage_Core_Model_Resource_Store_Collection
+     */
+    public function getStores()
+    {
+        if ($this->_stores === null) {
+            $this->_stores = \Mage::getResourceModel('core/store_collection');
+        }
+
+        return $this->_stores;
     }
 }
