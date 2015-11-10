@@ -18,6 +18,11 @@ use Symfony\Component\Finder\Finder;
 class Import extends AbstractImpex
 {
     /**
+     * @type string
+     */
+    const DELETE_VALUE = '!!delete';
+    
+    /**
      * @var string
      */
     protected $_folder = null;
@@ -158,7 +163,12 @@ class Import extends AbstractImpex
                 // Valid scope Write output
                 $value = str_replace("\r", '', addcslashes($value, '"'));
                 $value = str_replace("\n", '\\n', $value); // no multiline statements possible :-(
-                $return[] = 'config:set --scope=' . $scope . ' --scope-id=' . $scopeId . ' "' . $path . '" "' . $value . '"';
+                
+                if ($value === self::DELETE_VALUE) {
+                    $return[] = 'config:delete --scope=' . $scope . ' --scope-id=' . $scopeId . ' "' . $path . '"';
+                } else {
+                    $return[] = 'config:set --scope=' . $scope . ' --scope-id=' . $scopeId . ' "' . $path . '" "' . $value . '"';
+                }
             }
         }
 
