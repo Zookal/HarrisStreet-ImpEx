@@ -167,7 +167,7 @@ class Import extends AbstractImpex
                 if ($value === self::DELETE_VALUE) {
                     $return[] = 'config:delete --scope=' . $scope . ' --scope-id=' . $scopeId . ' "' . $path . '"';
                 } else {
-                    $return[] = 'config:set --scope=' . $scope . ' --scope-id=' . $scopeId . ' "' . $path . '" "' . $value . '"';
+                    $return[] = 'config:set --scope=' . $scope . ' --scope-id=' . $scopeId . ' -- "' . $path . '" "' . $value . '"';
                 }
             }
         }
